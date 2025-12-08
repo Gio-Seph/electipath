@@ -4,12 +4,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { tieBreaker } from "./tiebreaker";
 import { calculateScores } from "./scoring";
 import { useAuth } from "../../context/AuthContext";
+import API_BASE_URL from "../../config/api";
 
 export default function TieBreakerScreen() {
   const location = useLocation();
   const navigate = useNavigate();
   const { authFetch } = useAuth();
   const answers = location.state?.answers;
+  const finalXP = location.state?.finalXP ?? 0;
+  const finalLevel = location.state?.finalLevel ?? 1;
+  const completionTime = location.state?.completionTime ?? "00:05:00";
 
   if (!answers) {
     return (
@@ -27,37 +31,25 @@ export default function TieBreakerScreen() {
     );
   }
 
-  // Helper function to get CSRF token from cookies
-  const getCsrfToken = () => {
-    const name = "csrftoken";
-    const cookies = document.cookie.split(";");
-    for (let cookie of cookies) {
-      const [key, value] = cookie.trim().split("=");
-      if (key === name) {
-        return value;
-      }
-    }
-    return null;
-  };
-
   const handleChoice = async (electiveKey) => {
     const result = calculateScores(answers, electiveKey);
     const recommendedElective = result.recommended;
+    if (!recommendedElective) {
+      console.error("Tiebreaker did not resolve to an elective");
+      return;
+    }
     
     // Save result to backend using authFetch
     try {
       const response = await authFetch(`${API_BASE_URL}/api/survey-result/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           selected_elective: recommendedElective,
           trait_scores: result.traitScores,
           elective_scores: result.electiveScores,
-          total_xp: 400, // Max XP for completing survey
-          level: 3, // Max level for completing survey
-          completion_time: "00:05:00", // Estimated time for tiebreaker
+          total_xp: finalXP,
+          level: finalLevel,
+          completion_time: completionTime,
           questions_answered: answers.length,
         }),
       });
@@ -76,8 +68,8 @@ export default function TieBreakerScreen() {
         answers: answers,
         traitScores: result.traitScores,
         electiveScores: result.electiveScores,
-        finalXP: 400,
-        finalLevel: 3
+        finalXP: finalXP,
+        finalLevel: finalLevel
       } 
     });
   };
