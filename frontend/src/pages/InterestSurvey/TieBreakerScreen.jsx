@@ -1,4 +1,4 @@
-// src/pages/InterestSurvey/TieBreakerScreen.jsx
+// src/pages/InterestSurvey/TiebreakerScreen.jsx
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { tieBreaker } from "./tiebreaker";
