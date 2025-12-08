@@ -11,7 +11,7 @@ import MobilePage from "./pages/explore/MobilePage";
 import MultimediaPage from "./pages/explore/MultimediaPage";
 import InterestSurveyLanding from "./pages/InterestSurvey/LandingScreen";
 import SurveyScreen from "./pages/InterestSurvey/SurveyScreen";
-import TieBreakerScreen from "./pages/InterestSurvey/TiebreakerScreen";
+import TieBreakerScreen from "./pages/InterestSurvey/TieBreakerScreen";
 import ResultScreen from "./pages/InterestSurvey/ResultScreen";
 import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
