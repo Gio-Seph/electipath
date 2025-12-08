@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Avg
 import logging
 
 from activities.models import ActivityResult
@@ -37,7 +36,9 @@ class GenerateRecommendationView(APIView):
                     "message": "No activity data yet. Recommendation based on survey only."
                 })
 
-            avg_score = activity_results.aggregate(avg_score=Avg("performance_score"))["avg_score"] or 0
+            # Calculate average performance score using the method (not a DB field)
+            performance_scores = [activity.calculate_performance_score() for activity in activity_results]
+            avg_score = sum(performance_scores) / len(performance_scores) if performance_scores else 0
 
             # ✅ Simple rule-based recommendation fallback
             recommendation_map = {
