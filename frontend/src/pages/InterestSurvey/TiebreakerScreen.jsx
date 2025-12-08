@@ -1,19 +1,17 @@
-// src/pages/InterestSurvey/TiebreakerScreen.jsx
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { tieBreaker } from "./tiebreaker";
 import { calculateScores } from "./scoring";
 import { useAuth } from "../../context/AuthContext";
-import API_BASE_URL from "../../config/api";
 
 export default function TieBreakerScreen() {
   const location = useLocation();
   const navigate = useNavigate();
   const { authFetch } = useAuth();
   const answers = location.state?.answers;
-  const finalXP = location.state?.finalXP ?? 0;
-  const finalLevel = location.state?.finalLevel ?? 1;
-  const completionTime = location.state?.completionTime ?? "00:05:00";
+  const completionTime = location.state?.completionTime || "00:05:00";
+  const finalXP = location.state?.finalXP || 400;
+  const finalLevel = location.state?.finalLevel || 3;
 
   if (!answers) {
     return (
@@ -34,28 +32,37 @@ export default function TieBreakerScreen() {
   const handleChoice = async (electiveKey) => {
     const result = calculateScores(answers, electiveKey);
     const recommendedElective = result.recommended;
+    
+    // Validate that we have a recommendation
     if (!recommendedElective) {
-      console.error("Tiebreaker did not resolve to an elective");
+      console.error("No recommendation generated from scoring");
+      alert("Unable to generate recommendation. Please try again.");
       return;
     }
     
     // Save result to backend using authFetch
     try {
-      const response = await authFetch(`${API_BASE_URL}/api/survey-result/`, {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const payload = {
+        selected_elective: recommendedElective,
+        trait_scores: result.traitScores,
+        elective_scores: result.electiveScores,
+        total_xp: finalXP,
+        level: finalLevel,
+        completion_time: completionTime,
+        questions_answered: answers.length,
+      };
+      
+      console.log("Saving survey result:", payload);
+      
+      const response = await authFetch(`${API_URL}/api/survey-result/`, {
         method: "POST",
-        body: JSON.stringify({
-          selected_elective: recommendedElective,
-          trait_scores: result.traitScores,
-          elective_scores: result.electiveScores,
-          total_xp: finalXP,
-          level: finalLevel,
-          completion_time: completionTime,
-          questions_answered: answers.length,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        console.error("Failed to save survey result:", response.status, response.statusText);
+        const errorText = await response.text();
+        console.error("Failed to save survey result:", errorText);
       }
     } catch (error) {
       console.error("Error saving survey result:", error);

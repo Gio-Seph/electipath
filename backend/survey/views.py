@@ -91,53 +91,54 @@ class GenerateRecommendationView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        user = request.user
-        
-        # Get survey results
         try:
-            survey = SurveyResult.objects.get(user=user)
-            survey_scores = survey.elective_scores
-        except SurveyResult.DoesNotExist:
-            return Response(
-                {"detail": "Please complete the interest survey first."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Get activity results
-        activities = ActivityResult.objects.filter(user=user, completed=True)
-        
-        # Calculate activity scores per elective
-        activity_scores = {}
-        for elective in ['MobileDev', 'ITBA', 'MMGD']:
-            elective_activities = activities.filter(elective=elective)
+            user = request.user
             
-            if elective_activities.exists():
-                # Score based on:
-                # 1. Completion rate (did they finish activities?)
-                # 2. Time efficiency (faster = more engaged)
-                # 3. Engagement score (interactions, quality)
+            # Get survey results
+            try:
+                survey = SurveyResult.objects.get(user=user)
+                survey_scores = survey.elective_scores
+            except SurveyResult.DoesNotExist:
+                return Response(
+                    {"detail": "Please complete the interest survey first."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get activity results
+            activities = ActivityResult.objects.filter(user=user, completed=True)
+            
+            # Calculate activity scores per elective
+            activity_scores = {}
+            for elective in ['MobileDev', 'ITBA', 'MMGD']:
+                elective_activities = activities.filter(elective=elective)
                 
-                total_activities = 3  # Each elective has 3 activities
-                completed_count = elective_activities.count()
-                completion_rate = (completed_count / total_activities) * 100
-                
-                # ============================================================================
-                # ENHANCED ACTIVITY ANALYSIS FOR RECOMMENDATION
-                # Uses comprehensive performance metrics from activity analysis
-                # ============================================================================
-                
-                # 1. Completion Rate (30% weight)
-                # Did they finish all activities for this elective?
-                completion_rate = (completed_count / total_activities) * 100
-                
-                # 2. Overall Performance Score (40% weight)
-                # Uses calculate_performance_score() which combines:
-                #   - Completion status (30%)
-                #   - Engagement score (30%)
-                #   - Time efficiency (20%)
-                #   - Improvement rate (20%)
-                performance_scores = [a.calculate_performance_score() for a in elective_activities]
-                avg_performance = sum(performance_scores) / len(performance_scores) if performance_scores else 0
+                if elective_activities.exists():
+                    # Score based on:
+                    # 1. Completion rate (did they finish activities?)
+                    # 2. Time efficiency (faster = more engaged)
+                    # 3. Engagement score (interactions, quality)
+                    
+                    total_activities = 3  # Each elective has 3 activities
+                    completed_count = elective_activities.count()
+                    completion_rate = (completed_count / total_activities) * 100
+                    
+                    # ============================================================================
+                    # ENHANCED ACTIVITY ANALYSIS FOR RECOMMENDATION
+                    # Uses comprehensive performance metrics from activity analysis
+                    # ============================================================================
+                    
+                    # 1. Completion Rate (30% weight)
+                    # Did they finish all activities for this elective?
+                    completion_rate = (completed_count / total_activities) * 100
+                    
+                    # 2. Overall Performance Score (40% weight)
+                    # Uses calculate_performance_score() which combines:
+                    #   - Completion status (30%)
+                    #   - Engagement score (30%)
+                    #   - Time efficiency (20%)
+                    #   - Improvement rate (20%)
+                    performance_scores = [a.calculate_performance_score() for a in elective_activities]
+                    avg_performance = sum(performance_scores) / len(performance_scores) if performance_scores else 0
                 
                 # 3. Time Efficiency (20% weight)
                 # How efficiently did they complete activities (optimal time range)
@@ -270,22 +271,37 @@ class GenerateRecommendationView(APIView):
                     'activities_completed': 0,
                     'message': 'No activities completed'
                 }
+            
+            # Prepare response
+            response_data = {
+                'recommended_elective': recommended,
+                'confidence_score': round(confidence_level, 2),
+                'final_scores': final_scores,
+                'breakdown': {
+                    'survey_scores': normalized_survey,
+                    'survey_weight': '60%',
+                    'activity_scores': activity_scores,
+                    'activity_weight': '40%',
+                    'activity_analysis': activity_breakdown  # Enhanced activity breakdown
+                },
+                'activities_completed': activities.count(),
+                'survey_completed': True,
+                'analysis_method': 'Enhanced activity analysis using performance scores, time efficiency, and improvement rates'
+            }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
         
-        # Prepare response
-        response_data = {
-            'recommended_elective': recommended,
-            'confidence_score': round(confidence_level, 2),
-            'final_scores': final_scores,
-            'breakdown': {
-                'survey_scores': normalized_survey,
-                'survey_weight': '60%',
-                'activity_scores': activity_scores,
-                'activity_weight': '40%',
-                'activity_analysis': activity_breakdown  # Enhanced activity breakdown
-            },
-            'activities_completed': activities.count(),
-            'survey_completed': True,
-            'analysis_method': 'Enhanced activity analysis using performance scores, time efficiency, and improvement rates'
-        }
-        
-        return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            # Log the actual error for debugging
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Error in GenerateRecommendationView: {str(e)}")
+            print(error_details)
+            
+            return Response(
+                {
+                    "detail": f"Error generating recommendation: {str(e)}",
+                    "error_type": type(e).__name__
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
