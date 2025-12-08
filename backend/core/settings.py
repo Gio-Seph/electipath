@@ -173,9 +173,16 @@ if FRONTEND_URL:
 # --------------------------------------------------
 
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # ✅ RAILWAY SAFE HTTPS SETTINGS (NO REDIRECT LOOP)
+    SECURE_SSL_REDIRECT = False   # ❗ IMPORTANT: Disable HTTPS redirect loop on Railway
+
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+    # ✅ Tell Django the request is already HTTPS behind Railway proxy
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+
