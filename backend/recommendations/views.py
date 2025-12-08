@@ -1,12 +1,22 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from collections import defaultdict
 import logging
 
 from activities.models import ActivityResult
 from survey.models import SurveyResult
 
 logger = logging.getLogger(__name__)
+
+# Mapping between full names and codes
+ELECTIVE_NAME_TO_CODE = {
+    "Mobile Development": "MobileDev",
+    "Multimedia & Game Development": "MMGD",
+    "IT Business Analytics": "ITBA",
+}
+
+ELECTIVE_CODE_TO_NAME = {v: k for k, v in ELECTIVE_NAME_TO_CODE.items()}
 
 
 class GenerateRecommendationView(APIView):
@@ -24,43 +34,74 @@ class GenerateRecommendationView(APIView):
                     status=400
                 )
 
-            selected_elective = survey_result.selected_elective
+            # Get survey scores (should be a dict like {"MobileDev": 85, "ITBA": 72, "MMGD": 90})
+            survey_scores = survey_result.elective_scores or {}
+            
+            # Ensure all electives have scores (default to 0 if missing)
+            all_electives = ["MobileDev", "ITBA", "MMGD"]
+            survey_scores = {e: survey_scores.get(e, 0) for e in all_electives}
 
             # ✅ Get activity performance safely
             activity_results = ActivityResult.objects.filter(user=user)
+            activities_completed = activity_results.count()
 
-            if not activity_results.exists():
-                return Response({
-                    "recommended_elective": selected_elective,
-                    "avg_performance": 0,
-                    "message": "No activity data yet. Recommendation based on survey only."
-                })
+            # Calculate activity scores by elective
+            activity_scores_by_elective = defaultdict(list)
+            for activity in activity_results:
+                elective_code = activity.elective  # Should be "MobileDev", "ITBA", or "MMGD"
+                score = activity.calculate_performance_score()
+                activity_scores_by_elective[elective_code].append(score)
 
-            # Calculate average performance score using the method (not a DB field)
-            performance_scores = [activity.calculate_performance_score() for activity in activity_results]
-            avg_score = sum(performance_scores) / len(performance_scores) if performance_scores else 0
+            # Calculate average activity scores per elective
+            activity_scores = {}
+            for elective in all_electives:
+                scores = activity_scores_by_elective.get(elective, [])
+                activity_scores[elective] = sum(scores) / len(scores) if scores else 0
 
-            # ✅ Simple rule-based recommendation fallback
-            recommendation_map = {
-                "Mobile Development": "Mobile Development",
-                "Multimedia & Game Development": "Multimedia & Game Development",
-                "IT Business Analytics": "IT Business Analytics",
-            }
+            # Combine survey (60%) and activity (40%) scores
+            survey_weight = 0.6
+            activity_weight = 0.4
+            final_scores = {}
+            for elective in all_electives:
+                survey_score = survey_scores.get(elective, 0)
+                activity_score = activity_scores.get(elective, 0)
+                final_scores[elective] = round(
+                    (survey_score * survey_weight) + (activity_score * activity_weight),
+                    1
+                )
 
-            final_recommendation = recommendation_map.get(
-                selected_elective,
-                selected_elective or "Undecided"
-            )
+            # Determine recommended elective (highest final score)
+            recommended_elective = max(final_scores.items(), key=lambda x: x[1])[0]
+
+            # Calculate confidence score based on gap between top and second score
+            sorted_scores = sorted(final_scores.values(), reverse=True)
+            top_score = sorted_scores[0]
+            second_score = sorted_scores[1] if len(sorted_scores) > 1 else 0
+            gap = top_score - second_score
+            # Confidence: 50% base + gap * 2 (max 100%)
+            confidence_score = min(100, round(50 + gap * 2))
+
+            # Convert selected_elective to code format if needed
+            selected_elective_code = survey_result.selected_elective
+            if selected_elective_code in ELECTIVE_NAME_TO_CODE:
+                selected_elective_code = ELECTIVE_NAME_TO_CODE[selected_elective_code]
 
             return Response({
-                "recommended_elective": final_recommendation,
-                "avg_performance": round(avg_score, 2),
-                "message": "Recommendation generated successfully."
+                "recommended_elective": recommended_elective,
+                "final_scores": final_scores,
+                "breakdown": {
+                    "survey_scores": survey_scores,
+                    "activity_scores": activity_scores,
+                },
+                "confidence_score": confidence_score,
+                "activities_completed": activities_completed,
             })
 
         except Exception as db_error:
             # ✅ REAL ERROR ONLY (NO FAKE MIGRATION MESSAGE)
             logger.error(f"Recommendation generation failed: {str(db_error)}")
+            import traceback
+            logger.error(traceback.format_exc())
             return Response(
                 {"error": "Recommendation calculation failed. Please check activity data."},
                 status=500
