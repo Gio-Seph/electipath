@@ -91,17 +91,21 @@ class GenerateRecommendationView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        user = request.user
-        
-        # Get survey results
         try:
-            survey = SurveyResult.objects.get(user=user)
-            survey_scores = survey.elective_scores
-        except SurveyResult.DoesNotExist:
-            return Response(
-                {"detail": "Please complete the interest survey first."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            print(f"[DEBUG] GenerateRecommendationView called for user: {request.user.username}")
+            user = request.user
+            
+            # Get survey results
+            try:
+                survey = SurveyResult.objects.get(user=user)
+                survey_scores = survey.elective_scores
+                print(f"[DEBUG] Survey scores: {survey_scores}")
+            except SurveyResult.DoesNotExist:
+                print(f"[DEBUG] No survey found for user {user.username}")
+                return Response(
+                    {"detail": "Please complete the interest survey first."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         
         # Get activity results
         activities = ActivityResult.objects.filter(user=user, completed=True)
@@ -271,21 +275,36 @@ class GenerateRecommendationView(APIView):
                     'message': 'No activities completed'
                 }
         
-        # Prepare response
-        response_data = {
-            'recommended_elective': recommended,
-            'confidence_score': round(confidence_level, 2),
-            'final_scores': final_scores,
-            'breakdown': {
-                'survey_scores': normalized_survey,
-                'survey_weight': '60%',
-                'activity_scores': activity_scores,
-                'activity_weight': '40%',
-                'activity_analysis': activity_breakdown  # Enhanced activity breakdown
-            },
-            'activities_completed': activities.count(),
-            'survey_completed': True,
-            'analysis_method': 'Enhanced activity analysis using performance scores, time efficiency, and improvement rates'
-        }
+            # Prepare response
+            response_data = {
+                'recommended_elective': recommended,
+                'confidence_score': round(confidence_level, 2),
+                'final_scores': final_scores,
+                'breakdown': {
+                    'survey_scores': normalized_survey,
+                    'survey_weight': '60%',
+                    'activity_scores': activity_scores,
+                    'activity_weight': '40%',
+                    'activity_analysis': activity_breakdown  # Enhanced activity breakdown
+                },
+                'activities_completed': activities.count(),
+                'survey_completed': True,
+                'analysis_method': 'Enhanced activity analysis using performance scores, time efficiency, and improvement rates'
+            }
+            
+            print(f"[DEBUG] Recommendation generated successfully: {recommended}")
+            return Response(response_data, status=status.HTTP_200_OK)
         
-        return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"[ERROR] GenerateRecommendationView failed: {str(e)}")
+            print(f"[ERROR] Traceback:\n{error_details}")
+            
+            return Response(
+                {
+                    "detail": f"Error generating recommendation: {str(e)}",
+                    "error_type": type(e).__name__
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
