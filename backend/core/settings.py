@@ -188,3 +188,26 @@ CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+
+
+# ======================================================
+# TEMP AUTO-SUPERUSER CREATION (REMOVE AFTER LOGIN)
+# ======================================================
+
+if os.environ.get("CREATE_SUPERUSER") == "True":
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        if not User.objects.filter(username="admin").exists():
+            User.objects.create_superuser(
+                username="admin",
+                email="admin@example.com",
+                password="Admin12345"
+            )
+            print("✅ Superuser created: admin / Admin12345")
+        else:
+            print("✅ Superuser already exists")
+    except Exception as e:
+        print("❌ Superuser creation failed:", e)
