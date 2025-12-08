@@ -110,6 +110,23 @@ export default function SurveyScreen() {
     // Calculate completion time in seconds
     const completionTimeMs = Date.now() - startTime;
     const completionTimeSeconds = Math.floor(completionTimeMs / 1000);
+    const completionTime = `00:${Math.floor(completionTimeSeconds / 60)
+      .toString()
+      .padStart(2, "0")}:${(completionTimeSeconds % 60).toString().padStart(2, "0")}`;
+
+    // If scores are tied or recommendation is missing, send user to tiebreaker
+    if (result.requiresTiebreaker || !result.recommended) {
+      navigate("/interest-survey/tie-breaker", {
+        state: {
+          answers: filled,
+          baseResult: result,
+          finalXP: xp,
+          finalLevel: level,
+          completionTime,
+        },
+      });
+      return;
+    }
 
     const payload = {
       selected_elective: result.recommended,
@@ -117,12 +134,11 @@ export default function SurveyScreen() {
       elective_scores: result.electiveScores,
       total_xp: xp,
       level: level,
-      completion_time: `00:${Math.floor(completionTimeSeconds / 60).toString().padStart(2, '0')}:${(completionTimeSeconds % 60).toString().padStart(2, '0')}`, // Format as HH:MM:SS
-      questions_answered: filled.filter(a => a !== null).length,
+      completion_time: completionTime, // Format as HH:MM:SS
+      questions_answered: filled.filter((a) => a !== null).length,
     };
 
     try {
-
       const API_URL = import.meta.env.VITE_API_URL;
       const res = await authFetch(`${API_URL}/api/survey-result/`, {
         method: "POST",
@@ -143,8 +159,8 @@ export default function SurveyScreen() {
         traitScores: result.traitScores, 
         electiveScores: result.electiveScores,
         finalXP: xp,
-        finalLevel: level
-      } 
+        finalLevel: level,
+      },
     });
   };
 
