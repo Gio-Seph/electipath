@@ -49,7 +49,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ STATIC FILES FIX
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,7 +86,7 @@ TEMPLATES = [
 ]
 
 # --------------------------------------------------
-# DATABASE (Auto-switch SQLite → PostgreSQL)
+# DATABASE (SQLite locally → PostgreSQL on Railway)
 # --------------------------------------------------
 
 DATABASES = {
@@ -122,11 +123,12 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
+
 USE_I18N = True
 USE_TZ = True
 
 # --------------------------------------------------
-# STATIC FILES (IMPORTANT FOR RAILWAY)
+# STATIC FILES
 # --------------------------------------------------
 
 STATIC_URL = '/static/'
@@ -140,7 +142,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --------------------------------------------------
-# CORS SETTINGS (React Frontend)
+# CORS SETTINGS
 # --------------------------------------------------
 
 CORS_ALLOW_CREDENTIALS = True
@@ -156,7 +158,7 @@ else:
     ]
 
 # --------------------------------------------------
-# CSRF SETTINGS (IMPORTANT FOR HTTPS)
+# CSRF SETTINGS
 # --------------------------------------------------
 
 CSRF_TRUSTED_ORIGINS = [
@@ -168,19 +170,14 @@ CSRF_TRUSTED_ORIGINS = [
 if FRONTEND_URL:
     CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
 
-# --------------------------------------------------
-# SECURITY FOR PRODUCTION
-# --------------------------------------------------
-
 # ======================================================
-# RAILWAY HTTPS & PROXY FIX (FINAL - NO REDIRECT LOOP)
+# ✅ FINAL RAILWAY HTTPS & PROXY FIX (NO REDIRECT LOOP)
 # ======================================================
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# ❗ CRITICAL: DO NOT FORCE HTTPS REDIRECT ON RAILWAY
-SECURE_SSL_REDIRECT = False
+SECURE_SSL_REDIRECT = False   # ✅ MUST stay False on Railway
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -188,28 +185,3 @@ CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-
-
-
-# ======================================================
-# FORCE RESET ADMIN SUPERUSER (TEMPORARY)
-# ======================================================
-
-if os.environ.get("RESET_ADMIN") == "True":
-    try:
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-
-        admin, created = User.objects.get_or_create(
-            username="admin",
-            defaults={"email": "admin@example.com"}
-        )
-
-        admin.set_password("Admin12345")
-        admin.is_superuser = True
-        admin.is_staff = True
-        admin.save()
-
-        print("✅ Admin password FORCE reset to: Admin12345")
-    except Exception as e:
-        print("❌ Admin reset failed:", e)
