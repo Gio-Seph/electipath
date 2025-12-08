@@ -16,55 +16,58 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # --------------------------------------------------
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-dev-key')
+SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-dev-key")
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
-if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
-    ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+if not ALLOWED_HOSTS or ALLOWED_HOSTS == [""]:
+    ALLOWED_HOSTS = ["*"]
 
 # --------------------------------------------------
 # APPLICATION DEFINITION
 # --------------------------------------------------
 
 INSTALLED_APPS = [
-    'corsheaders',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "corsheaders",  # ✅ MUST BE FIRST
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    'rest_framework',
-    'rest_framework_simplejwt',
+    "rest_framework",
+    "rest_framework_simplejwt",
 
-    'accounts',
-    'users',
-    'survey',
-    'activities',
+    "accounts",
+    "users",
+    "survey",
+    "activities",
 ]
 
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+# --------------------------------------------------
+# ✅ MIDDLEWARE (ORDER IS CRITICAL FOR CORS)
+# --------------------------------------------------
 
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # ✅ MUST BE FIRST
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # --------------------------------------------------
 # URL & WSGI
 # --------------------------------------------------
 
-ROOT_URLCONF = 'core.urls'
-WSGI_APPLICATION = 'core.wsgi.application'
+ROOT_URLCONF = "core.urls"
+WSGI_APPLICATION = "core.wsgi.application"
 
 # --------------------------------------------------
 # TEMPLATES
@@ -72,25 +75,25 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
 # --------------------------------------------------
-# DATABASE (SQLite locally → PostgreSQL on Railway)
+# DATABASE (SQLite → PostgreSQL on Railway)
 # --------------------------------------------------
 
 DATABASES = {
-    'default': dj_database_url.config(
+    "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600
     )
@@ -101,10 +104,10 @@ DATABASES = {
 # --------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # --------------------------------------------------
@@ -112,8 +115,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # --------------------------------------------------
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
@@ -121,9 +124,8 @@ REST_FRAMEWORK = {
 # INTERNATIONALIZATION
 # --------------------------------------------------
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
@@ -131,63 +133,19 @@ USE_TZ = True
 # STATIC FILES
 # --------------------------------------------------
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # --------------------------------------------------
 # DEFAULT AUTO FIELD
 # --------------------------------------------------
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# --------------------------------------------------
-# CORS SETTINGS
-# --------------------------------------------------
-
-CORS_ALLOW_CREDENTIALS = True
-
-FRONTEND_URL = os.environ.get('FRONTEND_URL')
-
-if FRONTEND_URL:
-    CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
-else:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ]
-
-# --------------------------------------------------
-# CSRF SETTINGS
-# --------------------------------------------------
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://*.railway.app",
-]
-
-if FRONTEND_URL:
-    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ======================================================
-# ✅ FINAL RAILWAY HTTPS & PROXY FIX (NO REDIRECT LOOP)
+# ✅✅✅ FINAL CORS + CSRF CONFIG FOR VERCEL (FIXED)
 # ======================================================
-
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-SECURE_SSL_REDIRECT = False   # ✅ MUST stay False on Railway
-
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
 
 CORS_ALLOW_ALL_ORIGINS = False
 
@@ -200,3 +158,40 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+# ======================================================
+# ✅ RAILWAY HTTPS & PROXY FIX (NO REDIRECT LOOP)
+# ======================================================
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SECURE_SSL_REDIRECT = False  # ✅ MUST stay False on Railway
+
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
