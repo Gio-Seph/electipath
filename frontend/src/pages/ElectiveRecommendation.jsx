@@ -17,7 +17,8 @@ export default function ElectiveRecommendation() {
   
   const fetchRecommendation = async () => {
     try {
-      const response = await authFetch(`${API_BASE_URL}/api/recommendation/`);
+      const API_URL = import.meta.env.VITE_API_URL;
+    const response = await authFetch(`${API_URL}/api/recommendation/`);
       if (response.ok) {
         const data = await response.json();
         setRecommendation(data);

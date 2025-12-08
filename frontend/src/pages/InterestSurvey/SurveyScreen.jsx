@@ -123,7 +123,8 @@ export default function SurveyScreen() {
 
     try {
 
-      const res = await authFetch(`${API_BASE_URL}/api/survey-result/`, {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const res = await authFetch(`${API_URL}/api/survey-result/`, {
         method: "POST",
         body: JSON.stringify(payload),
       });

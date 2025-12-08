@@ -92,7 +92,8 @@ export default function ResultScreen() {
     setIsRetaking(true);
     try {
 
-      const response = await authFetch(`${API_BASE_URL}/api/survey-result/me/`, {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const response = await authFetch(`${API_URL}/api/survey-result/me/`, {
         method: "DELETE",
       });
 

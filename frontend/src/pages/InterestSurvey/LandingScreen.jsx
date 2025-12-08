@@ -61,7 +61,8 @@ export default function LandingScreen() {
     const token = localStorage.getItem("access");
     if (!token) return;
   
-    fetch(`${API_BASE_URL}/api/survey-result/me/`, {
+    const API_URL = import.meta.env.VITE_API_URL;
+    fetch(`${API_URL}/api/survey-result/me/`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

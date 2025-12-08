@@ -34,19 +34,20 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       // Fetch survey result
-      const surveyRes = await authFetch(`${API_BASE_URL}/api/survey-result/me/`);
+      const API_URL = import.meta.env.VITE_API_URL;
+    const surveyRes = await authFetch(`${API_URL}/api/survey-result/me/`);
       if (surveyRes.ok) {
         setSurveyData(await surveyRes.json());
       }
 
       // Fetch recommendation
-      const recRes = await authFetch(`${API_BASE_URL}/api/recommendation/`);
+      const recRes = await authFetch(`${API_URL}/api/recommendation/`);
       if (recRes.ok) {
         setRecommendationData(await recRes.json());
       }
 
       // Fetch activity results
-      const activityRes = await authFetch(`${API_BASE_URL}/api/activity-result/`);
+      const activityRes = await authFetch(`${API_URL}/api/activity-result/`);
       if (activityRes.ok) {
         const activities = await activityRes.json();
         // Filter only completed activities
@@ -56,7 +57,7 @@ export default function Dashboard() {
       }
 
       // Fetch leaderboard preview (top 3)
-      const leaderRes = await authFetch(`${API_BASE_URL}/api/leaderboard/`);
+      const leaderRes = await authFetch(`${API_URL}/api/leaderboard/`);
       if (leaderRes.ok) {
         const data = await leaderRes.json();
         setLeaderboardPreview(data.slice(0, 3));
