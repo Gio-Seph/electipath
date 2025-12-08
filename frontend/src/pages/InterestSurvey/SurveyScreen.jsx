@@ -5,7 +5,6 @@ import confetti from "canvas-confetti";
 import { surveyQuestions } from "./surveyQuestions";
 import { calculateScores } from "./scoring";
 import { useAuth } from "../../context/AuthContext";
-import API_BASE_URL from "../../config/api";
 
 const XP_PER_QUESTION = 20;
 const XP_PER_LEVEL = 100;
@@ -123,7 +122,6 @@ export default function SurveyScreen() {
     };
 
     try {
-import API_BASE_URL from "../../config/api";
 
       const res = await authFetch(`${API_BASE_URL}/api/survey-result/`, {
         method: "POST",

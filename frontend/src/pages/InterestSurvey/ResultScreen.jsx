@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import Leaderboard from "../../components/Leaderboard";
 import { useAuth } from "../../context/AuthContext";
-import API_BASE_URL from "../../config/api";
 
 import mmgdMale from "../../assets/mmgd_male.jpg";
 import mmgdFemale from "../../assets/mmgd_female.jpg";
@@ -92,7 +91,6 @@ export default function ResultScreen() {
   const handleRetakeSurvey = async () => {
     setIsRetaking(true);
     try {
-import API_BASE_URL from "../../config/api";
 
       const response = await authFetch(`${API_BASE_URL}/api/survey-result/me/`, {
         method: "DELETE",

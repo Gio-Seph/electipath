@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { tieBreaker } from "./tiebreaker";
 import { calculateScores } from "./scoring";
 import { useAuth } from "../../context/AuthContext";
-import API_BASE_URL from "../../config/api";
 
 export default function TieBreakerScreen() {
   const location = useLocation();

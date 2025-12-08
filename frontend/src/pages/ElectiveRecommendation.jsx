@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { TrendingUp, Activity, Award, AlertCircle } from 'lucide-react';
-import API_BASE_URL from '../config/api';
 
 export default function ElectiveRecommendation() {
   const [recommendation, setRecommendation] = useState(null);

@@ -3,8 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import API_BASE_URL from "../../config/api";
-
 import mmgdMale from "../../assets/mmgd_male.jpg";
 import mmgdFemale from "../../assets/mmgd_female.jpg";
 import itbaMale from "../../assets/itba_male.jpg";
@@ -63,8 +61,6 @@ export default function LandingScreen() {
     const token = localStorage.getItem("access");
     if (!token) return;
   
-import API_BASE_URL from "../../config/api";
-
     fetch(`${API_BASE_URL}/api/survey-result/me/`, {
       method: "GET",
       headers: {
