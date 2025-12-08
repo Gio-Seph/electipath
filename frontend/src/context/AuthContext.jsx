@@ -24,8 +24,20 @@ export function AuthProvider({ children }) {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch (e) {
+          // If response isn't JSON, get text
+          const text = await res.text();
+          errorData = { detail: text || "Login failed" };
+        }
         console.error("Login failed:", res.status, errorData);
+        
+        // Show user-friendly error message
+        const errorMessage = errorData.detail || errorData.non_field_errors?.[0] || errorData.username?.[0] || errorData.password?.[0] || "Invalid username or password";
+        alert(errorMessage);
+        
         return null;
       }
 

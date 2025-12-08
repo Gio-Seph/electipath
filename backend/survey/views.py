@@ -234,16 +234,25 @@ class GenerateRecommendationView(APIView):
                 confidence_level = confidence
             
             # Save or update recommendation
-            recommendation, created = ElectiveRecommendation.objects.update_or_create(
-                user=user,
-                defaults={
-                    'survey_scores': normalized_survey,
-                    'activity_scores': activity_scores,
-                    'final_scores': final_scores,
-                    'recommended_elective': recommended,
-                    'confidence_score': round(confidence_level, 2)
-                }
-            )
+            try:
+                recommendation, created = ElectiveRecommendation.objects.update_or_create(
+                    user=user,
+                    defaults={
+                        'survey_scores': normalized_survey,
+                        'activity_scores': activity_scores,
+                        'final_scores': final_scores,
+                        'recommended_elective': recommended,
+                        'confidence_score': round(confidence_level, 2)
+                    }
+                )
+            except Exception as db_error:
+                # If table doesn't exist, migrations haven't run
+                if 'does not exist' in str(db_error).lower() or 'relation' in str(db_error).lower():
+                    logger.error(f"Database table missing. Error: {str(db_error)}")
+                    raise Exception(
+                        "Database migrations not applied. Please run: python manage.py migrate"
+                    ) from db_error
+                raise
             
             # Prepare detailed breakdown with enhanced activity analysis
             activity_breakdown = {}
