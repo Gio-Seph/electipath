@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "users",
     "survey",
     "activities",
+    "recommendations",  # ✅ NEW APP FOR COMBINED RECOMMENDATIONS
 ]
 
 # --------------------------------------------------
@@ -139,60 +140,31 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # --------------------------------------------------
-# DEFAULT AUTO FIELD
+# CORS SETTINGS
 # --------------------------------------------------
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# ======================================================
-# ✅✅✅ FINAL CORS + CSRF CONFIG FOR VERCEL (FIXED)
-# ======================================================
 
 CORS_ALLOW_ALL_ORIGINS = False
 
+# Get frontend URL from environment variable
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+
 CORS_ALLOWED_ORIGINS = [
+    FRONTEND_URL,
     "https://electipath.vercel.app",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://electipath.vercel.app",
-]
+# Also allow requests from localhost during development
+if DEBUG:
+    CORS_ALLOWED_ORIGINS.extend([
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ])
 
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
+# --------------------------------------------------
+# DEFAULT PRIMARY KEY FIELD TYPE
+# --------------------------------------------------
 
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
-
-# ======================================================
-# ✅ RAILWAY HTTPS & PROXY FIX (NO REDIRECT LOOP)
-# ======================================================
-
-USE_X_FORWARDED_HOST = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-SECURE_SSL_REDIRECT = False  # ✅ MUST stay False on Railway
-
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = "DENY"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

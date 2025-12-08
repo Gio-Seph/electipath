@@ -44,13 +44,13 @@ export default function TieBreakerScreen() {
     try {
       const API_URL = import.meta.env.VITE_API_URL;
       const payload = {
-        selected_elective: recommendedElective,
-        trait_scores: result.traitScores,
-        elective_scores: result.electiveScores,
+          selected_elective: recommendedElective,
+          trait_scores: result.traitScores,
+          elective_scores: result.electiveScores,
         total_xp: finalXP,
         level: finalLevel,
         completion_time: completionTime,
-        questions_answered: answers.length,
+          questions_answered: answers.length,
       };
       
       console.log("Saving survey result:", payload);

@@ -16,4 +16,5 @@ urlpatterns = [
     path("api/", include("accounts.urls")),
     path("api/", include("survey.urls")),
     path("api/", include("activities.urls")),
+    path("api/", include("recommendations.urls")),  # ✅ NEW: Combined recommendations
 ]
