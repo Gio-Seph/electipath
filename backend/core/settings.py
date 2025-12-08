@@ -192,22 +192,24 @@ X_FRAME_OPTIONS = 'DENY'
 
 
 # ======================================================
-# TEMP AUTO-SUPERUSER CREATION (REMOVE AFTER LOGIN)
+# FORCE RESET ADMIN SUPERUSER (TEMPORARY)
 # ======================================================
 
-if os.environ.get("CREATE_SUPERUSER") == "True":
+if os.environ.get("RESET_ADMIN") == "True":
     try:
         from django.contrib.auth import get_user_model
         User = get_user_model()
 
-        if not User.objects.filter(username="admin").exists():
-            User.objects.create_superuser(
-                username="admin",
-                email="admin@example.com",
-                password="Admin12345"
-            )
-            print("✅ Superuser created: admin / Admin12345")
-        else:
-            print("✅ Superuser already exists")
+        admin, created = User.objects.get_or_create(
+            username="admin",
+            defaults={"email": "admin@example.com"}
+        )
+
+        admin.set_password("Admin12345")
+        admin.is_superuser = True
+        admin.is_staff = True
+        admin.save()
+
+        print("✅ Admin password FORCE reset to: Admin12345")
     except Exception as e:
-        print("❌ Superuser creation failed:", e)
+        print("❌ Admin reset failed:", e)
