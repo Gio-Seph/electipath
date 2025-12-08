@@ -188,3 +188,15 @@ X_FRAME_OPTIONS = 'DENY'
 
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
+
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGINS = [
+    "https://electipath.vercel.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://electipath.vercel.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True
