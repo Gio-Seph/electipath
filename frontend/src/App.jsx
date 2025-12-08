@@ -19,7 +19,6 @@ import Navbar from "./components/Navbar";
 function App() {
   console.log("VITE_API_URL =", import.meta.env.VITE_API_URL);
   const { user } = useAuth(); // ✅ now user is defined
-
   return (
     <>
       {/* Show Navbar for all pages except login & register */}
