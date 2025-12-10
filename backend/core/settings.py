@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "survey",
     "activities",
     "recommendations",  # ✅ NEW APP FOR COMBINED RECOMMENDATIONS
+    'django_extensions',
 ]
 
 # --------------------------------------------------
