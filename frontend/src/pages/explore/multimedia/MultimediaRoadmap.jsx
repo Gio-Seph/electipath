@@ -4,70 +4,37 @@ import SubjectRoadmap from "../../../components/shared/SubjectRoadmap";
 // Subject sequence for Multimedia
 const subjectSequence = [
   {
-    semester: "1st Year - 1st Semester",
+    semester: "1st Semester",
     subjects: [
       { 
-        code: "ART101", 
-        name: "Digital Art Fundamentals", 
-        prerequisite: null,
-        description: "Basic digital art techniques using Photoshop and Illustrator"
-      },
-      { 
-        code: "DESIGN101", 
-        name: "Design Principles", 
-        prerequisite: null,
-        description: "Color theory, composition, and visual design fundamentals"
+        code: "ITMM 1", 
+        name: "Introduction to Multimedia", 
+        description: "Introduction to multimedia concepts, digital media creation, and multimedia development tools and techniques"
       }
     ]
   },
   {
-    semester: "1st Year - 2nd Semester",
+    semester: "2nd Semester",
     subjects: [
       { 
-        code: "ANIM201", 
-        name: "2D Animation", 
-        prerequisite: "ART101",
-        description: "Traditional and digital 2D animation techniques"
+        code: "ITMM 2", 
+        name: "Multimedia Course 2", 
+        description: "Description to be added"
       },
       { 
-        code: "PROG101", 
-        name: "Programming for Creatives", 
-        prerequisite: null,
-        description: "Basic programming concepts for multimedia applications"
-      }
-    ]
-  },
-  {
-    semester: "2nd Year - 1st Semester",
-    subjects: [
-      { 
-        code: "3D301", 
-        name: "3D Modeling & Animation", 
-        prerequisite: "ANIM201",
-        description: "3D modeling, rigging, and animation using Blender/Maya"
+        code: "ITMM 3", 
+        name: "Multimedia Course 3", 
+        description: "Description to be added"
       },
       { 
-        code: "GAME301", 
-        name: "Game Development Fundamentals", 
-        prerequisite: "PROG101",
-        description: "Unity game engine and C# programming for games"
-      }
-    ]
-  },
-  {
-    semester: "2nd Year - 2nd Semester",
-    subjects: [
-      { 
-        code: "GAME401", 
-        name: "Advanced Game Development", 
-        prerequisite: "GAME301",
-        description: "Advanced Unity features, multiplayer, and optimization"
+        code: "ITMM 4", 
+        name: "Multimedia Course 4", 
+        description: "Description to be added"
       },
       { 
-        code: "PORTFOLIO401", 
-        name: "Portfolio & Capstone", 
-        prerequisite: "3D301",
-        description: "Professional portfolio development and final project"
+        code: "ITMM 5", 
+        name: "Multimedia Course 5", 
+        description: "Description to be added"
       }
     ]
   }
@@ -79,8 +46,7 @@ export default function MultimediaRoadmap() {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-purple-400 mb-4">Academic Subject Sequence</h2>
         <p className="text-purple-200 max-w-2xl mx-auto">
-          The structured academic pathway to master multimedia and game development. 
-          Build from artistic foundations to advanced interactive systems.
+          The recommended sequence of subjects for multimedia elective.
         </p>
       </div>
       

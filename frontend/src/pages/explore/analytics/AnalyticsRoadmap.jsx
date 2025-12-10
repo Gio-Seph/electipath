@@ -4,70 +4,37 @@ import SubjectRoadmap from "../../../components/shared/SubjectRoadmap";
 // Subject sequence for Analytics
 const subjectSequence = [
   {
-    semester: "1st Year - 1st Semester",
+    semester: "1st Semester",
     subjects: [
       { 
-        code: "MATH101", 
-        name: "Statistics and Probability", 
-        prerequisite: null,
-        description: "Foundation in statistical concepts and probability theory"
-      },
-      { 
-        code: "PROG101", 
-        name: "Programming Fundamentals", 
-        prerequisite: null,
-        description: "Basic programming using Python for data manipulation"
+        code: "ITBAN 1", 
+        name: "Fundamentals of Business Analytics", 
+        description: "Introduction to business analytics principles, data analysis techniques, and analytical tools for business decision-making"
       }
     ]
   },
   {
-    semester: "1st Year - 2nd Semester",
+    semester: "2nd Semester",
     subjects: [
       { 
-        code: "DATA201", 
-        name: "Database Management Systems", 
-        prerequisite: "PROG101",
-        description: "SQL, database design, and data modeling"
+        code: "ITBAN 2", 
+        name: "Business Analytics Course 2", 
+        description: "Description to be added"
       },
       { 
-        code: "STAT201", 
-        name: "Applied Statistics", 
-        prerequisite: "MATH101",
-        description: "Hypothesis testing, regression, and statistical inference"
-      }
-    ]
-  },
-  {
-    semester: "2nd Year - 1st Semester",
-    subjects: [
-      { 
-        code: "ANALYTICS301", 
-        name: "Business Analytics", 
-        prerequisite: "DATA201",
-        description: "Business intelligence, KPIs, and analytics frameworks"
+        code: "ITBAN 3", 
+        name: "Business Analytics Course 3", 
+        description: "Description to be added"
       },
       { 
-        code: "VIZ301", 
-        name: "Data Visualization", 
-        prerequisite: "STAT201",
-        description: "Tableau, Power BI, and visual storytelling"
-      }
-    ]
-  },
-  {
-    semester: "2nd Year - 2nd Semester",
-    subjects: [
-      { 
-        code: "ML401", 
-        name: "Machine Learning Fundamentals", 
-        prerequisite: "ANALYTICS301",
-        description: "Predictive modeling and ML algorithms"
+        code: "ITBAN 4", 
+        name: "Business Analytics Course 4", 
+        description: "Description to be added"
       },
       { 
-        code: "CAPSTONE401", 
-        name: "Analytics Capstone Project", 
-        prerequisite: "VIZ301",
-        description: "End-to-end analytics project with real business data"
+        code: "ITBAN 5", 
+        name: "Business Analytics Course 5", 
+        description: "Description to be added"
       }
     ]
   }
@@ -79,8 +46,7 @@ export default function AnalyticsRoadmap() {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-cyan-400 mb-4">Academic Subject Sequence</h2>
         <p className="text-cyan-200 max-w-2xl mx-auto">
-          The structured academic pathway to master business analytics. 
-          Build from mathematical foundations to advanced machine learning.
+          The recommended sequence of subjects for business analytics elective.
         </p>
       </div>
       
